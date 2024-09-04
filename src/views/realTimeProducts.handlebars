@@ -1,0 +1,50 @@
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <link rel="stylesheet" href="/css/style.css" />
+        <script defer src="/socket.io/socket.io.js"></script>
+        <script defer src="/js/index.js"></script>
+        <title>Productos en Tiempo Real</title>
+    </head>
+    <body>
+        <div class="container" id="products">
+            {{#each products}}
+                <li class="product">
+                    <p class="productTitle">{{this.title}}</p> <button class="deletePB" id="deleteP{{this.id}}">Eliminar</button>
+                </li>
+            {{/each}}
+        </div>
+        <div class="container2">
+            <h1>Agregar Producto</h1>
+            <form>
+                <label for="title">Título:</label>
+                <input type="text" id="title" name="title" required />
+
+                <label for="description">Descripción:</label>
+                <textarea id="description" name="description" rows="4" required></textarea>
+
+                <label for="code">Código:</label>
+                <input type="text" id="code" name="code" required />
+
+                <label for="price">Precio:</label>
+                <input type="number" id="price" name="price" step="0.01" required />
+
+                <label for="status">Estado:</label>
+                <select id="status" name="status" required>
+                    <option value="available">Disponible</option>
+                    <option value="unavailable">No Disponible</option>
+                </select>
+
+                <label for="stock">Stock:</label>
+                <input type="number" id="stock" name="stock" required />
+
+                <label for="category">Categoría:</label>
+                <input type="text" id="category" name="category" required />
+
+                <button id="submit" >Enviar</button>
+            </form>
+        </div>
+    </body>
+</html>

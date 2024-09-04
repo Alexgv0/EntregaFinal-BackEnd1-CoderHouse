@@ -1,0 +1,105 @@
+[
+  {
+    "id": 1,
+    "title": "Smartphone X",
+    "description": "A high-end smartphone with a powerful processor and camera",
+    "code": "SMX123",
+    "price": 999.99,
+    "status": true,
+    "stock": 50,
+    "category": "Electronics",
+    "thumbnails": [
+      "/images/smartphone_x_1.png",
+      "/images/smartphone_x_2.png"
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Gaming Laptop",
+    "description": "A laptop designed for gaming with high performance GPU",
+    "code": "GL456",
+    "price": 1999.99,
+    "status": true,
+    "stock": 30,
+    "category": "Computers",
+    "thumbnails": [
+      "/images/gaming_laptop_1.png",
+      "/images/gaming_laptop_2.png"
+    ]
+  },
+  {
+    "id": 3,
+    "title": "Wireless Headphones",
+    "description": "Noise-cancelling wireless headphones with long battery life",
+    "code": "WH789",
+    "price": 199.99,
+    "status": true,
+    "stock": 100,
+    "category": "Accessories",
+    "thumbnails": [
+      "/images/wireless_headphones_1.png",
+      "/images/wireless_headphones_2.png"
+    ]
+  },
+  {
+    "id": 4,
+    "title": "4K TV",
+    "description": "Ultra HD 4K television with smart features",
+    "code": "TV101",
+    "price": 799.99,
+    "status": true,
+    "stock": 20,
+    "category": "Home Entertainment",
+    "thumbnails": [
+      "/images/4k_tv_1.png",
+      "/images/4k_tv_2.png"
+    ]
+  },
+  {
+    "id": 5,
+    "title": "Bluetooth Speaker",
+    "description": "Portable Bluetooth speaker with high-quality sound",
+    "code": "BS112",
+    "price": 49.99,
+    "status": true,
+    "stock": 150,
+    "category": "Audio",
+    "thumbnails": [
+      "/images/bluetooth_speaker_1.png",
+      "/images/bluetooth_speaker_2.png"
+    ]
+  },
+  {
+    "id": 6,
+    "title": "Prueba",
+    "description": "Descripción de prueba",
+    "code": "CODE1234",
+    "price": 12.34,
+    "status": true,
+    "stock": 1,
+    "category": "Test",
+    "thumbnails": [
+      "thumbnail123.jpg"
+    ]
+  },
+  {
+    "id": 8,
+    "title": "12",
+    "description": "12",
+    "code": "12",
+    "price": "1",
+    "status": "available",
+    "stock": "1",
+    "category": "1"
+  },
+  {
+    "id": 9,
+    "title": "hola",
+    "description": "1",
+    "code": "1",
+    "price": "",
+    "status": "available",
+    "stock": "",
+    "category": ""
+  }
+]
