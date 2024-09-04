@@ -81,25 +81,5 @@
     "thumbnails": [
       "thumbnail123.jpg"
     ]
-  },
-  {
-    "id": 8,
-    "title": "12",
-    "description": "12",
-    "code": "12",
-    "price": "1",
-    "status": "available",
-    "stock": "1",
-    "category": "1"
-  },
-  {
-    "id": 9,
-    "title": "hola",
-    "description": "1",
-    "code": "1",
-    "price": "",
-    "status": "available",
-    "stock": "",
-    "category": ""
   }
 ]
