@@ -1,18 +1,25 @@
 {
-    "name": "preentrega1",
+    "name": "EntregaFinal-BackEnd1-CoderHouse",
     "version": "1.0.0",
     "description": "",
     "main": "index.js",
     "type": "commonjs",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node index.js",
+        "dev": "nodemon index.js"
     },
     "keywords": [],
-    "author": "",
+    "author": "Kevin Alex Muñoz Pascal",
     "license": "ISC",
     "dependencies": {
+        "dotenv": "^16.4.5",
         "express": "^4.19.2",
         "express-handlebars": "^5.3.5",
+        "mongoose": "^8.6.1",
         "socket.io": "^4.7.5"
+    },
+    "engines": {
+        "node": ">=14.0.0"
     }
 }
