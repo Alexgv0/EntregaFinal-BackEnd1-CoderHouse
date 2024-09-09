@@ -3,14 +3,18 @@ const CartManager = require("../../cartManager");
 const router = express.Router();
 const mongoose = require("mongoose");
 
-const cartManager = new CartManager();
+//const cartManager = new CartManager(); FS
 const Cart = require("./../models/carts.model");
 
 // Lista los productos que pertenezcan al carrito con el parámetro cid proporcionados
 router.get("/:cid", async (req, res) => {
     try {
-        const cid = parseInt(req.params.cid);
-        const products = await cartManager.searchProductsByID(cid);
+        const cid = req.params.cid;
+        if (!mongoose.isValidObjectId(cid)) {
+            return res.status(404).json({ error: "Carrito no encontrado"});
+        }
+        //const products = await cartManager.searchProductsByID(cid); FS
+        const products = await Cart.findById(cid);
         res.status(200).json(products);
     } catch (error) {
         console.error("Error al buscar productos: ", error);
@@ -27,9 +31,15 @@ router.get("/:cid", async (req, res) => {
 */
 router.post("/", async (req, res) => {
     try {
-        const cart = await cartManager.createCart(req.body[0]);
-        const carts = await cartManager.addCart(cart);
-        await cartManager.saveCarts(carts);
+        //const cart = await cartManager.createCart(req.body[0]); FS
+        //const carts = await cartManager.addCart(cart); FS
+        //await cartManager.saveCarts(carts); FS
+        const { products } = req.body;
+        if (!products || !Array.isArray(products) || products.length === 0) {
+            return res.status(400).json({ message: "El carrito debe tener al menos un producto" });
+        }
+        //console.log(products);
+        const cart = await Cart.create({products});
         res.status(201).json({ message: "carrito agregado correctamente", cart: cart });
     } catch (error) {
         console.error("Error al agregar carrito: ", error);
