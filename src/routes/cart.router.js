@@ -1,8 +1,10 @@
 const express = require("express");
 const CartManager = require("../../cartManager");
 const router = express.Router();
+const mongoose = require("mongoose");
 
 const cartManager = new CartManager();
+const Cart = require("./../models/carts.model");
 
 // Lista los productos que pertenezcan al carrito con el parámetro cid proporcionados
 router.get("/:cid", async (req, res) => {
@@ -57,5 +59,25 @@ router.post("/:cid/product/:pid", async (req, res) => {
         res.status(500).json({ message: "No se pudo agregar el producto al carrito" });
     }
 });
+
+// Deberá eliminar del carrito el producto seleccionado.
+router.delete("/:cid/products/:pid", async() => {
+
+})
+
+// Deberá actualizar todos los productos del carrito con un arreglo de productos.
+router.put("/:cid", async() => {
+
+})
+
+// Deberá poder actualizar SÓLO la cantidad de ejemplares del producto por cualquier cantidad pasada desde req.body
+router.put("/:cid/products/:pid", async() => {
+
+})
+
+// Deberá eliminar todos los productos del carrito 
+router.delete("/:cid", async() => {
+
+})
 
 module.exports = router;

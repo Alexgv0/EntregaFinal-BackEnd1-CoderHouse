@@ -3,19 +3,6 @@ const { Server } = require("socket.io");
 const ProductManager = require("./productManager");
 const pm = new ProductManager();
 
-// Connect ATLAS DB
-const mongoose = require("mongoose");
-require("dotenv").config();
-
-mongoose
-    .connect(process.env.MONGODB_URI)
-    .then(() => {
-        console.log("Conectado a MongoDB Atlas");
-    })
-    .catch(error => {
-        console.error("Error al intentar conectar a MongoDB Atlas: ", error);
-    });
-
 const PORT = process.env.PORT;
 
 const server = app.listen(PORT, () => {
@@ -24,7 +11,6 @@ const server = app.listen(PORT, () => {
         Puedes acceder en el siguiente enlace: http://localhost:${PORT}
     `);
 });
-
 
 // Utilizando WebSockets
 const io = new Server(server);
