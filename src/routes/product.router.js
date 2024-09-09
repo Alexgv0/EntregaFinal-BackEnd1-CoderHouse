@@ -65,10 +65,10 @@ router.post("/", async (req, res) => {
     } catch (error) {
         console.error("Error desde router al guardar el producto: ", error);
         if (error.code == "11000") {
-            res.status(500).json({ error: "Error: El valor de 'code' ya existe en la base de datos" });
-        } else {
-            res.status(500).json({ error: "Error al agregar el producto" });
+            return res.status(500).json({ error: "Error: El valor de 'code' ya existe en la base de datos" });
         }
+        return res.status(500).json({ error: "Error al agregar el producto" });
+        
     }
 });
 
@@ -113,6 +113,9 @@ router.delete("/:pid", async (req, res) => {
         //const deletedProduct = await productManager.deleteProduct(products, pid); FS
         //await productManager.saveProducts(products); FS
         const deletedProduct = await Product.deleteOne({ _id: pid });
+        if (deletedProduct.deletedCount === 0) {
+            return res.status(404).json({ error: "Producto no encontrado"});
+        }
         res.status(200).json({ message: "Producto eliminado exitosamente.", deleted: deletedProduct });
     } catch (error) {
         console.error("Error al eliminar producto: ", error);
