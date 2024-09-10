@@ -5,13 +5,14 @@ const mongoose = require("mongoose");
 
 //const cartManager = new CartManager(); FS
 const Cart = require("./../models/carts.model");
+const Product = require("./../models/products.model");
 
 // Lista los productos que pertenezcan al carrito con el parámetro cid proporcionados
 router.get("/:cid", async (req, res) => {
     try {
         const cid = req.params.cid;
         if (!mongoose.isValidObjectId(cid)) {
-            return res.status(404).json({ error: "Carrito no encontrado"});
+            return res.status(404).json({ error: "Carrito no encontrado" });
         }
         //const products = await cartManager.searchProductsByID(cid); FS
         const products = await Cart.findById(cid);
@@ -39,7 +40,7 @@ router.post("/", async (req, res) => {
             return res.status(400).json({ message: "El carrito debe tener al menos un producto" });
         }
         //console.log(products);
-        const cart = await Cart.create({products});
+        const cart = await Cart.create({ products });
         res.status(201).json({ message: "carrito agregado correctamente", cart: cart });
     } catch (error) {
         console.error("Error al agregar carrito: ", error);
@@ -57,13 +58,45 @@ router.post("/", async (req, res) => {
 router.post("/:cid/product/:pid", async (req, res) => {
     try {
         const { cid, pid } = req.params;
-        const carts = await cartManager.addProductCarts(parseInt(cid), parseInt(pid));
-        if (carts === undefined) {
+        //const carts = await cartManager.addProductCarts(parseInt(cid), parseInt(pid)); FS
+        /* if (carts === undefined) {
             res.status(404).json({ message: "No existe el carrito al que se intenta ingresar el producto" });
             throw new Error("No existe el carrito al que se intenta ingresar el producto");
+        } */
+        //await cartManager.saveCarts(carts); FS
+        if (!mongoose.isValidObjectId(cid)) {
+            return res.status(400).json({ error: `cid con formato inválido: ${cid}` });
         }
-        await cartManager.saveCarts(carts);
-        res.status(201).json({ message: "Producto agregado al carrito correctamente", carts: carts });
+        if (!mongoose.isValidObjectId(pid)) {
+            return res.status(400).json({ error: `pid con formato inválido: ${pid}` });
+        }
+        const cart = await Cart.findById(cid);
+        if (cart.length === 0) {
+            return res.status(404).json({ message: "No existe el carrito al que se intenta ingresar el producto" });
+        }
+        const product = await Product.findById(pid);
+        if (product.length === 0) {
+            return res.status(404).json({ message: "No existe el producto que se intenta ingresar al carrito" });
+        }
+        const productInCart = cart.products.find(item => item.product.equals(pid));
+        if (productInCart) {
+            productInCart.quantity++;
+            // Opcion alterna
+            await Cart.updateOne(
+                { _id: cid, "products.product": pid }, 
+                { $inc: { "products.$.quantity": 1 } }
+            ); 
+        } else {
+            //cart.products.push({ product: product._id, quantity: 1 }); //Opcion mas corta
+            // Opcion alterna
+            await Cart.updateOne(
+                { _id: cid }, 
+                { $push: { products: { product: pid, quantity: 1 } } }
+            ); 
+           
+        }
+        //await cart.save(); // Opcion mas corta
+        res.status(201).json({ message: "Producto agregado al carrito correctamente", payload: productInCart || { product: product._id, quantity: 1 } });
     } catch (error) {
         console.error("Error desde router al agregar producto al carrito: ", error);
         res.status(500).json({ message: "No se pudo agregar el producto al carrito" });
@@ -71,23 +104,15 @@ router.post("/:cid/product/:pid", async (req, res) => {
 });
 
 // Deberá eliminar del carrito el producto seleccionado.
-router.delete("/:cid/products/:pid", async() => {
-
-})
+router.delete("/:cid/products/:pid", async () => {});
 
 // Deberá actualizar todos los productos del carrito con un arreglo de productos.
-router.put("/:cid", async() => {
-
-})
+router.put("/:cid", async () => {});
 
 // Deberá poder actualizar SÓLO la cantidad de ejemplares del producto por cualquier cantidad pasada desde req.body
-router.put("/:cid/products/:pid", async() => {
+router.put("/:cid/products/:pid", async () => {});
 
-})
-
-// Deberá eliminar todos los productos del carrito 
-router.delete("/:cid", async() => {
-
-})
+// Deberá eliminar todos los productos del carrito
+router.delete("/:cid", async () => {});
 
 module.exports = router;
