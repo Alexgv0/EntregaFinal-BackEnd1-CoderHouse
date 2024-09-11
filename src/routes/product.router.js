@@ -24,7 +24,7 @@ router.get("/:pid", async (req, res) => {
     try {
         const pid = req.params.pid;
         if (!mongoose.isValidObjectId(pid)) {
-            return res.status(400).json({ message: `ID con formato inválido: ${pid}` });
+            return res.status(400).json({ message: `pid con formato inválido: ${pid}` });
         }
         //const product = await productManager.searchProductByID(pid); FS
         const product = await Product.findById(pid);
@@ -77,7 +77,7 @@ router.put("/:pid", async (req, res) => {
     try {
         const pid = req.params.pid;
         if (!mongoose.isValidObjectId(pid)) {
-            return res.status(400).json({ message: `ID con formato inválido: ${pid}` });
+            return res.status(400).json({ message: `pid con formato inválido: ${pid}` });
         }
         const { title, description, code, price, status, stock, category, thumbnails } = req.body;
         const changes = {};
@@ -107,7 +107,7 @@ router.delete("/:pid", async (req, res) => {
     try {
         const pid = req.params.pid;
         if (!mongoose.isValidObjectId(pid)) {
-            return res.status(400).json({ message: `ID con formato inválido: ${pid}` });
+            return res.status(400).json({ message: `pid con formato inválido: ${pid}` });
         }
         //const products = await productManager.readData(); FS
         //const deletedProduct = await productManager.deleteProduct(products, pid); FS

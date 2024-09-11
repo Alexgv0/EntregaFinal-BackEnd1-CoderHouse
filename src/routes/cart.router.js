@@ -12,7 +12,7 @@ router.get("/:cid", async (req, res) => {
     try {
         const cid = req.params.cid;
         if (!mongoose.isValidObjectId(cid)) {
-            return res.status(404).json({ error: "Carrito no encontrado" });
+            return res.status(400).json({ error: "cid con formato inválido:" });
         }
         //const products = await cartManager.searchProductsByID(cid); FS
         const products = await Cart.findById(cid);
@@ -41,7 +41,7 @@ router.post("/", async (req, res) => {
         }
         //console.log(products);
         const cart = await Cart.create({ products });
-        res.status(201).json({ message: "carrito agregado correctamente", cart: cart });
+        res.status(201).json({ message: "carrito agregado correctamente", payload: cart });
     } catch (error) {
         console.error("Error al agregar carrito: ", error);
         res.status(500).json({ message: "Error al agregar carrito a los carritos" });
@@ -82,21 +82,17 @@ router.post("/:cid/product/:pid", async (req, res) => {
         if (productInCart) {
             productInCart.quantity++;
             // Opcion alterna
-            await Cart.updateOne(
-                { _id: cid, "products.product": pid }, 
-                { $inc: { "products.$.quantity": 1 } }
-            ); 
+            await Cart.updateOne({ _id: cid, "products.product": pid }, { $inc: { "products.$.quantity": 1 } });
         } else {
             //cart.products.push({ product: product._id, quantity: 1 }); //Opcion mas corta
             // Opcion alterna
-            await Cart.updateOne(
-                { _id: cid }, 
-                { $push: { products: { product: pid, quantity: 1 } } }
-            ); 
-           
+            await Cart.updateOne({ _id: cid }, { $push: { products: { product: pid, quantity: 1 } } });
         }
         //await cart.save(); // Opcion mas corta
-        res.status(201).json({ message: "Producto agregado al carrito correctamente", payload: productInCart || { product: product._id, quantity: 1 } });
+        res.status(201).json({
+            message: "Producto agregado al carrito correctamente",
+            payload: productInCart || { product: product._id, quantity: 1 },
+        });
     } catch (error) {
         console.error("Error desde router al agregar producto al carrito: ", error);
         res.status(500).json({ message: "No se pudo agregar el producto al carrito" });
@@ -104,15 +100,98 @@ router.post("/:cid/product/:pid", async (req, res) => {
 });
 
 // Deberá eliminar del carrito el producto seleccionado.
-router.delete("/:cid/products/:pid", async () => {});
+router.delete("/:cid/products/:pid", async (req, res) => {
+    try {
+        const { cid, pid } = req.params;
+        if (!mongoose.isValidObjectId(cid)) {
+            return res.status(400).json({ error: `cid con formato inválido: ${cid}` });
+        }
+        if (!mongoose.isValidObjectId(pid)) {
+            return res.status(400).json({ error: `pid con formato inválido: ${pid}` });
+        }
+        const deletedProduct = await Cart.updateOne({ _id: cid }, { $pull: { products: { product: pid } } });
+        // Sirve para verificar si se realizo un cambio y asi saber si no se encontro el producto o en carrito
+        if (deletedProduct.nModified === 0) {
+            return res.status(404).json({ message: "Carrito o producto no encontrado" });
+        }
+        res.status(200).json({ message: "Producto eliminado del carrito correctamente", payload: deletedProduct });
+    } catch (error) {
+        console.error("Error al eliminar producto del carrito: ", error);
+        res.status(500).json({ message: "Error al eliminar el producto del carrito" });
+    }
+});
 
 // Deberá actualizar todos los productos del carrito con un arreglo de productos.
-router.put("/:cid", async () => {});
+router.put("/:cid", async (req, res) => {
+    try {
+        const { cid } = req.params;
+        const { products } = req.body;
+        if (!mongoose.isValidObjectId(cid)) {
+            return res.status(400).json({ error: `cid con formato inválido: ${cid}` });
+        }
+        if (!Array.isArray(products) || products.length === 0) {
+            console.log(products);
+            return res.status(400).json({ error: `El elemento pasado por body no es un array o esta vacio` });
+        }
+        const payload = await Cart.updateOne(
+            { _id: cid },
+            { $set: { products } },
+            { new: true } // Retorna el documento actualizado
+        );
+        return res.status(200).json({ message: "El carrito fue actualizado correctamente", payload });
+    } catch (error) {
+        console.log(`Error al intentar actualizar los productos del carrito: ${error}`);
+        return res.status(500).json({ error: "Error al intentar actualizar los productos del carrito" });
+    }
+});
 
 // Deberá poder actualizar SÓLO la cantidad de ejemplares del producto por cualquier cantidad pasada desde req.body
-router.put("/:cid/products/:pid", async () => {});
+router.put("/:cid/products/:pid", async (req, res) => {
+    try {
+        const { cid, pid } = req.params;
+        const { quantity } = req.body;
+        if (!mongoose.isValidObjectId(cid)) {
+            return res.status(400).json({ error: `cid con formato inválido: ${cid}` });
+        }
+        if (!mongoose.isValidObjectId(pid)) {
+            return res.status(400).json({ error: `pid con formato inválido: ${pid}` });
+        }
+        if (isNaN(parseInt(quantity)) || parseInt(quantity) < 0) {
+            return res.status(400).json({ error: `Cantidad pasada por body inválida: ${quantity}` });
+        }
+        const payload = await Cart.updateOne(
+            { _id: cid, "products.product": pid },
+            { $set: { "products.$.quantity": parseInt(quantity) } }
+        );
+        if (payload.modifiedCount === 0) {
+            return res.status(404).json({ error: `No se encontro el producto en el carrito especificado` });
+        }
+        return res.status(200).json({
+            message: `La cantidad del producto con el id = ${pid} en el carrito con el id = ${cid} fue actualizada correctamente`,
+            payload,
+        });
+    } catch (error) {
+        console.error(`Error al intentar actualizar la cantidad del producto en el carrito especificado: ${error}`);
+        return res.status(500).json({ error: `Error al intentar actualizar la cantidad del producto en el carrito especificado` });
+    }
+});
 
 // Deberá eliminar todos los productos del carrito
-router.delete("/:cid", async () => {});
+router.delete("/:cid", async (req, res) => {
+    try {
+        const { cid } = req.params;
+        if (!mongoose.isValidObjectId(cid)) {
+            return res.status(400).json({ error: `cid con formato inválido: ${cid}` });
+        }
+        const payload = await Cart.updateOne({ _id: cid }, { $set: { products: [] } });
+        if (payload.modifiedCount === 0) {
+            return res.status(404).json({ error: `Carrito con id = ${cid} no encontrado o actualmente vacio` });
+        }
+        return res.status(200).json({ message: "Carrito vaciado correctamente", payload });
+    } catch (error) {
+        console.error("Error al intentar vaciar el carrito: ", error);
+        return res.status(500).json({ error: "Error al intentar vaciar el carrito" });
+    }
+});
 
 module.exports = router;
