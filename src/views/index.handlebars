@@ -14,5 +14,15 @@
           </li>
       {{/each}}
   </ol>
+  <bottom>
+    <p>Página actual: {{currentPage}}</p>
+    <p>Total de páginas: {{totalPages}}</p>
+    {{#if nextPage}}
+    <a href="?page={{nextPage}}&limit={{limit}}">Página siguiente ({{nextPage}})</a> <br>
+    {{/if}}
+    {{#if prevPage}}
+    <a href="?page={{prevPage}}&limit={{limit}}">Página anterior ({{prevPage}})</a> <br>
+    {{/if}}
+  </bottom>
 </body>
 </html>

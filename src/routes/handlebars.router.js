@@ -1,13 +1,9 @@
 const express = require("express");
 const router = express.Router();
+const handlebarsController = require("../controllers/handlebarsController");
 
-router.get("/products", async (req, res) => {
-    const products = await pm.readData();
-    res.render("index", { title: "Productos", products});
-});
+router.get("/products", handlebarsController.getAllUsersPaginate);
 
-router.get("/realtimeproducts", async (req, res) => {
-    res.render("realTimeProducts");
-});
+router.get("/realtimeproducts", handlebarsController.renderRealTimeProducts);
 
 module.exports = router;

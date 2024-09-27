@@ -3,7 +3,7 @@ const socket = io();
 console.log("In Client");
 
 const enviar = document.getElementById("submit");
-const botonesEliminar = Object.entries(document.getElementsByClassName("deletePB"));
+const deleteButtons = document.getElementsByClassName("deletePB");
 
 const title = document.getElementById("title");
 const description = document.getElementById("description");
@@ -16,7 +16,7 @@ const category = document.getElementById("category");
 socket.on("allProducts", productsList => {
     const productsContainer = document.getElementById("products");
     productsContainer.innerHTML = "";
-    console.log(productsList);
+    //console.log(productsList);
     productsList.forEach(product => {
         addProductToDOM(product);
     });
@@ -37,8 +37,6 @@ socket.on("productDeleted", pid => {
     deletedProduct.remove();
 });
 
-//console.log(botonesEliminar);
-
 const addProductToDOM = (product) => {
     const products = document.getElementById("products");
     const productItem = document.createElement('li');
@@ -53,65 +51,54 @@ const addProductToDOM = (product) => {
     newButton.addEventListener("click", async event => deleteProduct(newButton, event));
 }
 
-const deleteProduct = async (button, event) => {
-    event.preventDefault();
-    const pid = button.id.replace("deleteP", "");
-    const URL = "api/products/" + pid;
-
-    socket.emit("deleteProduct", pid);
-    try {
-        const response = await fetch(URL, {
-            method: "DELETE",
-        });
-        const result = await response.json();
-        alert(result.message);
-    } catch (error) {
-        console.error("Error en la solicitud:", error);
-        alert("Hubo un error al intentar eliminar el producto");
-    }
-};
 
 // FIXME:
 const addProduct = async event => {
-
-    if (!title.value || !description.value || !code.value || !price.value || !statusb.value || !stock.value || !category.value) {
-        alert("Por favor, completa todos los campos.");
-        return;
-    }
     
-    const newProduct = {
-        title: title.value,
-        description: description.value,
-        code: code.value,
-        price: price.value,
-        status: statusb.value,
-        stock: stock.value,
-        category: category.value,
-    };
-
-    //console.log(newProduct);
-
-    event.preventDefault();
-
-    socket.emit("addProduct", newProduct);
-
-    title.value = "";
-    description.value = "";
-    code.value = "";
-    price.value = "";
-    statusb.value = "";
-    stock.value = "";
-    category.value = "";
-
     try {
-        const response = await fetch("/api/products", {
+        if (!title.value || !description.value || !code.value || !price.value || !statusb.value || !stock.value || !category.value) {
+            alert("Por favor, completa todos los campos.");
+            return;
+        }
+        
+        const newProduct = {
+            title: title.value,
+            description: description.value,
+            code: code.value,
+            price: price.value,
+            status: (statusb.value === "available"),
+            stock: stock.value,
+            category: category.value,
+        };
+        
+        //console.log(newProduct);
+        
+        event.preventDefault();
+        
+        const result = await fetch("/api/products", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(newProduct),
         });
-
+        
+        if (result.status === 200) {
+            socket.emit("addProduct", newProduct);
+        } else if (result.status === 400) {
+            alert("Ya existe un producto con ese codigo")
+            throw new Error("Ya existe un producto con ese codigo");
+        }
+        
+        title.value = "";
+        description.value = "";
+        code.value = "";
+        price.value = "";
+        statusb.value = "";
+        stock.value = "";
+        category.value = "";
+        
+        
         //const result = await response.json();
         //alert(result.message);
     } catch (error) {
@@ -120,8 +107,33 @@ const addProduct = async event => {
     }
 };
 
-botonesEliminar.forEach(button => {
-    button[1].addEventListener("click", async event => deleteProduct(button[1], event));
-});
-
 enviar.addEventListener("click", async event => addProduct(event));
+
+// deleteButtons
+
+const deleteProduct = async (button, event) => {
+    console.log("intento");
+    try {
+        event.preventDefault();
+        const pid = button.id.replace("deleteP", "");
+        const URL = "api/products/" + pid;
+        const response = await fetch(URL, {
+            method: "DELETE",
+        });
+        if (response.status === 200) {
+            socket.emit("deleteProduct", pid);
+        } else { 
+            throw new Error("No se pudo eliminar el producto");
+        }
+        const result = await response.json();
+        alert(result.message);
+    } catch (error) {
+        console.error("Error en la solicitud:", error);
+        alert("Hubo un error al intentar eliminar el producto");
+    }
+};
+
+for (const button of deleteButtons) {
+    console.log(button);
+    button[1].addEventListener("click", async event => deleteProduct(button[1], event));
+}

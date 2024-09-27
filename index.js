@@ -1,9 +1,8 @@
 const app = require("./src/app");
 const { Server } = require("socket.io");
-const ProductManager = require("./productManager");
-const pm = new ProductManager();
+const Product = require("./src/models/products.model");
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 8080;
 
 const server = app.listen(PORT, () => {
     console.log(`
@@ -18,7 +17,8 @@ const io = new Server(server);
 io.on("connection", async socket => {
     console.log(`Usuario ${socket.id} conectado`);
     // FIXME:
-    let products = await pm.readData();
+    //let products = await pm.readData(); FS
+    const products = await Product.find().select("title").lean();
 
     socket.emit("allProducts", products);
 
