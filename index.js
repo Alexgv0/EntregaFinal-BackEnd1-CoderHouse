@@ -16,8 +16,6 @@ const io = new Server(server);
 
 io.on("connection", async socket => {
     console.log(`Usuario ${socket.id} conectado`);
-    // FIXME:
-    //let products = await pm.readData(); FS
     const products = await Product.find().select("title").lean();
 
     socket.emit("allProducts", products);
